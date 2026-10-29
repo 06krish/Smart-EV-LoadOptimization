@@ -32,6 +32,9 @@
   .dark .border-\[\#E2E8F0\] {
     border-color: #1E293B !important;
   }
+  .dark .bg-white:not([class*="dark:bg-"]) {
+    background-color: #111827 !important;
+  }
   .dark .bg-slate-50 {
     background-color: #1E293B !important;
   }

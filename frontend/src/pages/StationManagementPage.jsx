@@ -177,15 +177,15 @@ export const StationManagementPage = () => {
           return (
             <div key={st.id} className="saas-card p-6 space-y-6">
               {/* Station Head */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
                   <div className="flex items-center space-x-3">
-                    <h2 className="text-lg font-bold text-[#2E3A8C]">{st.name}</h2>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6FAF7] text-[#008472] border border-[#00C2A8]/30 font-mono">
+                    <h2 className="text-lg font-bold text-[#2E3A8C] dark:text-white">{st.name}</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6FAF7] dark:bg-teal-950/60 text-[#008472] dark:text-[#52DFCE] border border-[#00C2A8]/30 font-mono">
                       Online & Optimal
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2 text-xs text-slate-500 mt-1">
+                  <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     <span>{st.location}</span>
                   </div>
@@ -194,7 +194,7 @@ export const StationManagementPage = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => openEditStation(st)}
-                    className="p-2 text-[#2E3A8C] hover:bg-slate-100 rounded-xl transition-colors text-xs font-semibold flex items-center space-x-1"
+                    className="p-2 text-[#2E3A8C] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-xs font-semibold flex items-center space-x-1"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                     <span>Edit Specs</span>
@@ -202,7 +202,7 @@ export const StationManagementPage = () => {
                   {stations.length > 1 && (
                     <button
                       onClick={() => setDeleteConfirmId(st.id)}
-                      className="p-2 text-coral-500 hover:text-coral-700 hover:bg-coral-50 rounded-xl transition-colors text-xs"
+                      className="p-2 text-coral-500 hover:text-coral-700 hover:bg-coral-50 dark:hover:bg-coral-950/40 rounded-xl transition-colors text-xs"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -212,28 +212,28 @@ export const StationManagementPage = () => {
 
               {/* Station Metrics Overview */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Grid Ceiling</span>
-                  <span className="text-xl font-bold text-[#2E3A8C] font-mono mt-1 block">{st.grid_capacity_kw} kW</span>
-                  <span className="text-[10px] text-slate-500">Transformer Max</span>
+                  <span className="text-xl font-bold text-[#2E3A8C] dark:text-white font-mono mt-1 block">{st.grid_capacity_kw} kW</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Transformer Max</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Facility Base Load</span>
-                  <span className="text-xl font-bold text-[#2E3A8C] font-mono mt-1 block">{st.base_load_kw} kW</span>
-                  <span className="text-[10px] text-slate-500">Non-EV auxiliary draw</span>
+                  <span className="text-xl font-bold text-[#2E3A8C] dark:text-white font-mono mt-1 block">{st.base_load_kw} kW</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Non-EV auxiliary draw</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Current Live Load</span>
-                  <span className="text-xl font-bold text-[#008472] font-mono mt-1 block">{currentLoad} kW</span>
-                  <span className="text-[10px] text-slate-500">Headroom: {st.available_capacity_kw} kW</span>
+                  <span className="text-xl font-bold text-[#008472] dark:text-[#52DFCE] font-mono mt-1 block">{currentLoad} kW</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Headroom: {st.available_capacity_kw} kW</span>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Port Provisioning</span>
-                  <span className="text-xl font-bold text-[#2E3A8C] font-mono mt-1 block">{totalPowerCapacity} kW</span>
-                  <span className={`text-[10px] font-semibold ${isOverprovisioned ? 'text-amber-600' : 'text-slate-500'}`}>
+                  <span className="text-xl font-bold text-[#2E3A8C] dark:text-white font-mono mt-1 block">{totalPowerCapacity} kW</span>
+                  <span className={`text-[10px] font-semibold ${isOverprovisioned ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400'}`}>
                     {isOverprovisioned ? 'Overprovisioned (Optimizer active)' : 'Within bounds'}
                   </span>
                 </div>
@@ -241,32 +241,32 @@ export const StationManagementPage = () => {
 
               {/* Bays */}
               <div>
-                <h3 className="text-xs font-bold text-[#2E3A8C] uppercase tracking-wider mb-3 font-mono">
+                <h3 className="text-xs font-bold text-[#2E3A8C] dark:text-slate-200 uppercase tracking-wider mb-3 font-mono">
                   Station Charging Ports ({stChargers.length} Bays)
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {stChargers.map((ch) => (
-                    <div key={ch.id} className="p-4 rounded-xl border border-slate-200 bg-white hover:border-[#00C2A8]/40 transition-colors flex flex-col justify-between shadow-2xs">
+                    <div key={ch.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/90 hover:border-[#00C2A8]/50 transition-colors flex flex-col justify-between shadow-2xs">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-bold text-[#2E3A8C] text-sm">{ch.identifier}</span>
+                          <span className="font-bold text-[#2E3A8C] dark:text-white text-sm">{ch.identifier}</span>
                           <StatusBadge status={ch.status} type="charger" />
                         </div>
-                        <div className="text-xs text-slate-600 space-y-1 my-2">
+                        <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1 my-2">
                           <div className="flex justify-between">
-                            <span className="text-slate-400">Standard:</span>
-                            <strong className="text-slate-800">{ch.connector_type}</strong>
+                            <span className="text-slate-400 dark:text-slate-400">Standard:</span>
+                            <strong className="text-slate-800 dark:text-slate-100">{ch.connector_type}</strong>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-slate-400">Power Rating:</span>
-                            <strong className="text-slate-800 font-mono">{ch.max_power_kw} kW</strong>
+                            <span className="text-slate-400 dark:text-slate-400">Power Rating:</span>
+                            <strong className="text-slate-800 dark:text-slate-100 font-mono">{ch.max_power_kw} kW</strong>
                           </div>
                         </div>
                       </div>
 
                       <button
                         onClick={() => openEditCharger(ch)}
-                        className="mt-3 w-full py-1.5 text-xs font-semibold text-[#2E3A8C] hover:text-[#00C2A8] bg-slate-50 hover:bg-[#E6FAF7] rounded-lg transition-colors border border-slate-200"
+                        className="mt-3 w-full py-1.5 text-xs font-semibold text-[#2E3A8C] dark:text-slate-200 hover:text-[#00C2A8] dark:hover:text-[#00C2A8] bg-slate-50 dark:bg-slate-700 hover:bg-[#E6FAF7] dark:hover:bg-slate-600 rounded-lg transition-colors border border-slate-200 dark:border-slate-600"
                       >
                         Configure Bay
                       </button>

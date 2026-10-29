@@ -71,8 +71,8 @@ export const LoadPredictionPage = () => {
         </div>
 
         {/* Horizon Selector */}
-        <div className="flex items-center space-x-1.5 bg-white p-1.5 rounded-2xl border border-[#E2E8F0] shadow-soft">
-          <span className="text-xs font-bold text-slate-400 px-2 font-mono">Lookahead:</span>
+        <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-[#E2E8F0] dark:border-slate-800 shadow-soft">
+          <span className="text-xs font-bold text-slate-400 dark:text-slate-400 px-2 font-mono">Lookahead:</span>
           {[6, 12, 24, 48].map((h) => (
             <button
               key={h}
@@ -80,7 +80,7 @@ export const LoadPredictionPage = () => {
               className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
                 horizon === h 
                   ? 'bg-[#00C2A8] text-white shadow-teal-glow font-mono' 
-                  : 'text-slate-600 hover:bg-slate-100 font-mono'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-mono'
               }`}
             >
               {h}h
@@ -224,12 +224,12 @@ export const LoadPredictionPage = () => {
       </div>
 
       {/* Methodological Disclosure Card */}
-      <div className="saas-card p-5 bg-white border-l-4 border-l-[#00C2A8]">
-        <div className="flex items-center space-x-2 text-[#2E3A8C] font-bold text-sm mb-1">
+      <div className="saas-card p-5 border-l-4 border-l-[#00C2A8]">
+        <div className="flex items-center space-x-2 text-[#2E3A8C] dark:text-white font-bold text-sm mb-1">
           <Sparkles className="w-4 h-4 text-[#00C2A8]" />
           <span>Data Pipeline & Machine Learning Methodology</span>
         </div>
-        <p className="text-xs text-slate-600 leading-relaxed">
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
           Trained on 721 hourly rows combining commuter arrival surges with background facility power. 
           Uses cyclic sine/cosine hour encoding, day-of-week, 24-hour lag, and a 6-hour moving average to feed accurate baseline power forecasts into the upstream LP optimization solver.
         </p>
