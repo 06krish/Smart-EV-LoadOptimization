@@ -1,10 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from accounts.permissions import IsAdminOrReadOnly
 from .models import ChargingStation, Charger
 from .serializers import ChargingStationSerializer, ChargerSerializer
 
 class ChargingStationViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = ChargingStation.objects.all().order_by('id')
     serializer_class = ChargingStationSerializer
 
@@ -28,6 +30,7 @@ class ChargingStationViewSet(viewsets.ModelViewSet):
 
 
 class ChargerViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Charger.objects.all().order_by('id')
     serializer_class = ChargerSerializer
     filterset_fields = ['station', 'status', 'connector_type']

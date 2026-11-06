@@ -12,19 +12,26 @@ import {
   TrendingUp,
   Layers,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onMobileClose }) => {
-  const navItems = [
+  const { user, isAdmin } = useAuth();
+
+  const allNavItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/forecasting', label: 'Load Map', icon: TrendingUp },
     { to: '/optimization', label: 'Charging Sessions', icon: Zap, badge: 'Smart' },
     { to: '/vehicles', label: 'Fleet', icon: Car },
-    { to: '/stations', label: 'Stations', icon: Layers },
+    { to: '/stations', label: 'Stations', icon: Layers, adminOnly: true },
     { to: '/analytics', label: 'Analytics', icon: BarChart3 },
-    { to: '/settings', label: 'Settings', icon: Settings },
+    { to: '/settings', label: 'Settings', icon: Settings, adminOnly: true },
   ];
+
+  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <>

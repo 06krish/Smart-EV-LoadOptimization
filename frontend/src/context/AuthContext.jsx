@@ -35,36 +35,52 @@ export const AuthProvider = ({ children }) => {
     }
   }, [refreshToken]);
 
-  const login = async (emailOrUsername, password, rememberMe = true) => {
+  const login = async (emailOrUsername, password, portal = 'USER', rememberMe = true) => {
     try {
-      const res = await SmartEVApi.login({ email: emailOrUsername, password });
-      const { user: userData, access, refresh, role } = res.data;
-      const combinedUser = { ...userData, role: role || 'Grid Operator' };
+      const res = await SmartEVApi.login({ 
+        email: emailOrUsername, 
+        password,
+        portal 
+      });
+      const { user: userData, access, refresh, role, role_label } = res.data;
+      const combinedUser = { 
+        ...userData, 
+        role: role || (portal === 'ADMIN' ? 'ADMIN' : 'USER'),
+        role_label: role_label || (role === 'ADMIN' ? 'Grid Administrator' : 'EV Fleet Driver'),
+        isAdmin: role === 'ADMIN' || userData.is_admin
+      };
       
       setUser(combinedUser);
       setAccessToken(access);
       setRefreshToken(refresh);
 
       if (rememberMe) {
-        localStorage.setItem('smartev_remembered_email', emailOrUsername);
-      } else {
-        localStorage.removeItem('smartev_remembered_email');
+        localStorage.setItem(`smartev_remembered_${portal.toLowerCase()}`, emailOrUsername);
       }
 
       return { success: true, user: combinedUser };
     } catch (err) {
       const errorMsg = err.response?.data?.error || 
                        err.response?.data?.detail || 
-                       'Invalid email or password. Please try again.';
-      return { success: false, error: errorMsg };
+                       'Invalid credentials. Please verify your email and password.';
+      return { 
+        success: false, 
+        error: errorMsg,
+        portalMismatch: err.response?.data?.portal_mismatch || false
+      };
     }
   };
 
   const register = async (userData) => {
     try {
       const res = await SmartEVApi.register(userData);
-      const { user: newUser, access, refresh, role } = res.data;
-      const combinedUser = { ...newUser, role: role || 'Fleet Manager' };
+      const { user: newUser, access, refresh, role, role_label } = res.data;
+      const combinedUser = { 
+        ...newUser, 
+        role: 'USER',
+        role_label: role_label || 'EV Fleet Driver',
+        isAdmin: false
+      };
       setUser(combinedUser);
       setAccessToken(access);
       setRefreshToken(refresh);
@@ -74,7 +90,7 @@ export const AuthProvider = ({ children }) => {
                        err.response?.data?.email?.[0] || 
                        err.response?.data?.password?.[0] || 
                        err.response?.data?.error || 
-                       'Registration failed. Please check your details.';
+                       'Registration failed. Please verify your details.';
       return { success: false, error: errorMsg };
     }
   };
@@ -88,12 +104,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('smartev_refresh_token');
   };
 
+  const isAdmin = user?.role === 'ADMIN' || user?.isAdmin || user?.is_admin;
+
   return (
     <AuthContext.Provider value={{ 
       user, 
       accessToken, 
       refreshToken, 
       isAuthenticated: !!user, 
+      isAdmin,
       login, 
       register, 
       logout 

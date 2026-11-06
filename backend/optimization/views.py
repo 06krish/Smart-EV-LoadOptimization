@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from accounts.permissions import IsAdminUserRole, IsAdminOrReadOnly
 from stations.models import ChargingStation
 from charging.models import ChargingSession
 from .models import OptimizationResult, Schedule
@@ -8,6 +9,7 @@ from .serializers import OptimizationResultSerializer, ScheduleSerializer
 from .engine import OptimizationEngine
 
 class OptimizationRunView(APIView):
+    permission_classes = [IsAdminUserRole]
     def post(self, request):
         station_id = request.data.get('station_id')
         station = None
@@ -99,5 +101,6 @@ class OptimizationResultViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Schedule.objects.all().order_by('-created_at')
     serializer_class = ScheduleSerializer
