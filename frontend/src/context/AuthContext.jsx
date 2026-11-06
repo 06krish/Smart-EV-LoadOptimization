@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }) => {
       role: 'Grid Operator'
     };
   });
-  const [token, setToken] = useState(() => localStorage.getItem('smartev_token'));
+  const [accessToken, setAccessToken] = useState(() => localStorage.getItem('smartev_access_token'));
+  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('smartev_refresh_token'));
 
   useEffect(() => {
     if (user) {
@@ -25,23 +26,42 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('smartev_token', token);
+    if (accessToken) {
+      localStorage.setItem('smartev_access_token', accessToken);
     } else {
-      localStorage.removeItem('smartev_token');
+      localStorage.removeItem('smartev_access_token');
     }
-  }, [token]);
+  }, [accessToken]);
 
-  const login = async (username, password) => {
+  useEffect(() => {
+    if (refreshToken) {
+      localStorage.setItem('smartev_refresh_token', refreshToken);
+    } else {
+      localStorage.removeItem('smartev_refresh_token');
+    }
+  }, [refreshToken]);
+
+  const login = async (emailOrUsername, password, rememberMe = true) => {
     try {
-      const res = await SmartEVApi.login({ username, password });
-      const { user: userData, token: userToken, role } = res.data;
+      const res = await SmartEVApi.login({ email: emailOrUsername, password });
+      const { user: userData, access, refresh, role } = res.data;
       const combinedUser = { ...userData, role: role || 'Grid Operator' };
+      
       setUser(combinedUser);
-      setToken(userToken);
-      return { success: true };
+      setAccessToken(access);
+      setRefreshToken(refresh);
+
+      if (rememberMe) {
+        localStorage.setItem('smartev_remembered_email', emailOrUsername);
+      } else {
+        localStorage.removeItem('smartev_remembered_email');
+      }
+
+      return { success: true, user: combinedUser };
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Invalid credentials.';
+      const errorMsg = err.response?.data?.error || 
+                       err.response?.data?.detail || 
+                       'Invalid email or password. Please try again.';
       return { success: false, error: errorMsg };
     }
   };
@@ -49,29 +69,41 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const res = await SmartEVApi.register(userData);
-      const { user: newUser, token: userToken, role } = res.data;
+      const { user: newUser, access, refresh, role } = res.data;
       const combinedUser = { ...newUser, role: role || 'Fleet Manager' };
       setUser(combinedUser);
-      setToken(userToken);
-      return { success: true };
+      setAccessToken(access);
+      setRefreshToken(refresh);
+      return { success: true, user: combinedUser };
     } catch (err) {
       const errorMsg = err.response?.data?.username?.[0] || 
+                       err.response?.data?.email?.[0] || 
                        err.response?.data?.password?.[0] || 
                        err.response?.data?.error || 
-                       'Registration failed.';
+                       'Registration failed. Please check your details.';
       return { success: false, error: errorMsg };
     }
   };
 
   const logout = () => {
     setUser(null);
-    setToken(null);
+    setAccessToken(null);
+    setRefreshToken(null);
     localStorage.removeItem('smartev_user');
-    localStorage.removeItem('smartev_token');
+    localStorage.removeItem('smartev_access_token');
+    localStorage.removeItem('smartev_refresh_token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      accessToken, 
+      refreshToken, 
+      isAuthenticated: !!user, 
+      login, 
+      register, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

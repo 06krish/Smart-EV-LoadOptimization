@@ -8,6 +8,18 @@ const api = axios.create({
   timeout: 25000,
 });
 
+// Request interceptor to attach JWT Access Token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('smartev_access_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
