@@ -24,3 +24,4 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if hasattr(request.user, 'profile'):
             return request.user.profile.is_admin()
         return request.user.is_staff or request.user.is_superuser
+

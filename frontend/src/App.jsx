@@ -21,14 +21,15 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* 1. Login Selection Hub */}
-            <Route path="/login-select" element={<LoginSelectionPage />} />
-            
-            {/* 2. Admin & User Dedicated Portals */}
-            <Route path="/login/admin" element={<AdminLoginPage />} />
+            {/* 1. Direct Default Login Portal (User / Driver) */}
+            <Route path="/login" element={<UserLoginPage />} />
             <Route path="/login/user" element={<UserLoginPage />} />
-            <Route path="/login" element={<Navigate to="/login-select" replace />} />
-            <Route path="/" element={<Navigate to="/login-select" replace />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            
+            {/* 2. Hidden Admin Login Portal (Direct URL Access Only) */}
+            <Route path="/admin-login" element={<AdminLoginPage />} />
+            <Route path="/login/admin" element={<AdminLoginPage />} />
+            <Route path="/login-select" element={<Navigate to="/login" replace />} />
 
             {/* 3. Protected Dashboard Routes with Role Guards */}
             <Route

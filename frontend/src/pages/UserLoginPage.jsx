@@ -127,22 +127,17 @@ export const UserLoginPage = () => {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
         <div className="relative z-10">
-          <Link to="/login-select" className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-6 group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Switch Login Type</span>
-          </Link>
-
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center space-x-3.5 mb-2">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#00C2A8] to-[#A3E635] flex items-center justify-center shadow-teal-glow">
               <User className="w-6 h-6 text-white" strokeWidth={2.4} />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-extrabold text-xl tracking-tight text-white font-sans">Smart-EV</span>
-                <span className="font-extrabold text-xl tracking-tight text-[#00C2A8] font-sans">User Portal</span>
+                <span className="font-extrabold text-xl tracking-tight text-[#00C2A8] font-sans">LoadOptimization</span>
               </div>
               <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase block">
-                EV Driver & Charging Session Telemetry
+                Autonomous Energy Management OS
               </span>
             </div>
           </div>
@@ -208,11 +203,11 @@ export const UserLoginPage = () => {
         <div className="w-full max-w-md space-y-6">
           
           <div className="text-left">
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-mono inline-block mb-2">
-              Driver Portal
+            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-950/60 text-[#008472] dark:text-[#52DFCE] border border-[#00C2A8]/30 font-mono inline-block mb-2">
+              Secure Sign In
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E3A8C] dark:text-white tracking-tight font-sans">
-              {isRegister ? 'Create User Account' : 'User Login'}
+              {isRegister ? 'Create User Account' : 'Welcome'}
             </h2>
             <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-body">
               {isRegister 
@@ -421,12 +416,9 @@ export const UserLoginPage = () => {
           </div>
 
           <div className="text-center">
-            <Link
-              to="/login/admin"
-              className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-[#2E3A8C] dark:hover:text-white transition-colors"
-            >
-              Are you a Grid Administrator? Switch to Admin Login &rarr;
-            </Link>
+            <span className="text-[11px] text-slate-400 font-mono">
+              Smart-EV Energy Management &bull; Fleet Operations
+            </span>
           </div>
 
         </div>
@@ -437,3 +429,4 @@ export const UserLoginPage = () => {
 };
 
 export default UserLoginPage;
+

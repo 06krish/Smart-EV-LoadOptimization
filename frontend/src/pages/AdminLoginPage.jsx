@@ -94,9 +94,9 @@ export const AdminLoginPage = () => {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
         <div className="relative z-10">
-          <Link to="/login-select" className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-6 group">
+          <Link to="/login" className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors mb-6 group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Switch Login Type</span>
+            <span>Back to Portal</span>
           </Link>
 
           <div className="flex items-center space-x-3.5">
@@ -318,12 +318,9 @@ export const AdminLoginPage = () => {
             </form>
 
             <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
-              <Link
-                to="/login/user"
-                className="text-xs font-semibold text-[#008472] dark:text-[#52DFCE] hover:underline"
-              >
-                Not an admin? Switch to User Login &rarr;
-              </Link>
+              <span className="text-[11px] text-slate-400 font-mono">
+                Direct Administrator Terminal &bull; Confidential
+              </span>
             </div>
           </div>
 
@@ -335,3 +332,4 @@ export const AdminLoginPage = () => {
 };
 
 export default AdminLoginPage;
+
