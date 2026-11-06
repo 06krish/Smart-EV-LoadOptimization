@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
-import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardPage from './pages/DashboardPage';
 import OptimizationPage from './pages/OptimizationPage';
@@ -19,12 +19,18 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Landing & Auth Pages */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Direct Login Page */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Enterprise Operations Dashboard Layout */}
-            <Route element={<DashboardLayout />}>
+            {/* Protected Enterprise Operations Dashboard Layout */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/optimization" element={<OptimizationPage />} />
               <Route path="/forecasting" element={<LoadPredictionPage />} />
@@ -34,8 +40,8 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Fallback to login */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

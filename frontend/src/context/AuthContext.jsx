@@ -6,13 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('smartev_user');
-    return saved ? JSON.parse(saved) : {
-      username: 'operator',
-      first_name: 'Alex',
-      last_name: 'Morgan',
-      email: 'operator@smartev.io',
-      role: 'Grid Operator'
-    };
+    return saved ? JSON.parse(saved) : null;
   });
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('smartev_access_token'));
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('smartev_refresh_token'));
