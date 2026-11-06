@@ -237,7 +237,7 @@ export const LoginPage = () => {
           {/* Form Header */}
           <div className="text-left">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2E3A8C] dark:text-white tracking-tight font-sans">
-              {isRegister ? 'Create Operator Account' : 'Welcome Back'}
+              {isRegister ? 'Create Operator Account' : 'Welcome'}
             </h2>
             <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-body">
               {isRegister 
