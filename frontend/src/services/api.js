@@ -21,6 +21,11 @@ api.interceptors.response.use(
 );
 
 export const SmartEVApi = {
+  // Auth
+  login: (credentials) => api.post('/auth/login/', credentials),
+  register: (userData) => api.post('/auth/register/', userData),
+  getCurrentUser: () => api.get('/auth/me/'),
+
   // Dashboard Summary
   getDashboardSummary: () => api.get('/dashboard/summary/'),
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Menu, 
   Play, 
@@ -11,16 +12,21 @@ import {
   AlertTriangle,
   User,
   Sliders,
-  ShieldCheck
+  ShieldCheck,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 import { SmartEVApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 export const Navbar = ({ onMobileToggle, onDataChange, isSidebarCollapsed }) => {
+  const { user, logout, isAuthenticated } = useAuth();
   const [selectedSite, setSelectedSite] = useState('Metro Central EV Hub');
   const [loadingAction, setLoadingAction] = useState(null);
   const [toast, setToast] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleTick = async (minutes) => {
     try {
@@ -170,15 +176,55 @@ export const Navbar = ({ onMobileToggle, onDataChange, isSidebarCollapsed }) => 
           )}
         </div>
 
-        {/* Profile Avatar */}
-        <div className="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-700">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2E3A8C] to-[#00C2A8] flex items-center justify-center text-white font-bold text-xs shadow-xs">
-            OP
-          </div>
-          <div className="hidden lg:flex flex-col text-left">
-            <span className="text-xs font-bold text-[#2E3A8C] dark:text-white leading-none">Alex Morgan</span>
-            <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">Grid Operator</span>
-          </div>
+        {/* Profile Avatar / Auth */}
+        <div className="relative pl-2 border-l border-slate-200 dark:border-slate-700">
+          {isAuthenticated ? (
+            <div 
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-2 cursor-pointer p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#2E3A8C] to-[#00C2A8] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                {user?.first_name ? `${user.first_name[0]}${user.last_name ? user.last_name[0] : ''}` : user?.username?.[0]?.toUpperCase() || 'OP'}
+              </div>
+              <div className="hidden lg:flex flex-col text-left">
+                <span className="text-xs font-bold text-[#2E3A8C] dark:text-white leading-none">
+                  {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.username}
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">{user?.role || 'Grid Operator'}</span>
+              </div>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#00C2A8] hover:bg-[#00A38D] text-white text-xs font-bold shadow-teal-glow transition-all"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Login</span>
+            </Link>
+          )}
+
+          {showUserMenu && isAuthenticated && (
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-soft-hover border border-[#E2E8F0] dark:border-slate-700 p-2 text-xs z-50 animate-fade-up">
+              <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                <p className="font-bold text-[#2E3A8C] dark:text-white">{user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.username}</p>
+                <p className="text-[10px] text-slate-400 font-mono truncate">{user?.email || `${user?.username}@smartev.io`}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold rounded-md bg-[#E6FAF7] dark:bg-teal-950/60 text-[#008472] dark:text-[#52DFCE] border border-[#00C2A8]/30">
+                  {user?.role || 'Grid Operator'}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  setShowUserMenu(false);
+                  logout();
+                }}
+                className="w-full mt-1 flex items-center space-x-2 px-3 py-2 text-left text-coral-600 dark:text-coral-400 hover:bg-coral-50 dark:hover:bg-coral-950/40 rounded-xl transition-colors font-semibold"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
