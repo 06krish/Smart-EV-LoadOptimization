@@ -107,8 +107,17 @@ export const EVManagementPage = () => {
       setIsModalOpen(false);
       fetchVehicles();
     } catch (err) {
+      console.error('Error saving vehicle:', err);
       const serverErrors = err.response?.data || {};
-      setFormErrors(serverErrors);
+      if (typeof serverErrors === 'string') {
+        alert(serverErrors);
+      } else {
+        const errorMessages = Object.entries(serverErrors)
+          .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+          .join('\n');
+        alert(errorMessages || 'Failed to save vehicle parameters. Please check inputs.');
+      }
+      setFormErrors(typeof serverErrors === 'object' ? serverErrors : {});
     } finally {
       setSubmitting(false);
     }
