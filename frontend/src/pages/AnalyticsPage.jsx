@@ -118,17 +118,21 @@ export const AnalyticsPage = () => {
       <div className="saas-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-bold text-[#2E3A8C]">7-Day Financial Benchmark: Uncoordinated vs Optimized Cost ($)</h3>
-            <p className="text-xs text-slate-500">Savings achieved by deferring high-power charging away from peak price windows</p>
+            <h3 className="text-sm font-bold text-[#2E3A8C]">Daily charging cost: before and after optimization</h3>
+            <p className="text-xs text-slate-500">Each date has two bars. Red is the estimated cost without smart scheduling; teal is the estimated cost with it. Shorter teal bars indicate lower estimated cost.</p>
           </div>
         </div>
 
-        <div className="h-72 w-full">
+        <div
+          className="h-72 w-full"
+          role="img"
+          aria-label="Grouped bar chart comparing estimated daily electricity cost in US dollars before and after charging optimization."
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={dailyTrends} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} unit=" $" />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: '#FFFFFF', 
@@ -138,7 +142,10 @@ export const AnalyticsPage = () => {
                 }}
                 formatter={(val, name) => [`$${val}`, name === 'cost_before_usd' ? 'Baseline Cost' : 'Optimized Cost']} 
               />
-              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+              <Legend
+                wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                formatter={(value) => value === 'cost_before_usd' ? 'Before optimization' : 'After optimization'}
+              />
               <Bar dataKey="cost_before_usd" name="cost_before_usd" fill="#EF4444" radius={[6, 6, 0, 0]} />
               <Bar dataKey="cost_after_usd" name="cost_after_usd" fill="#00C2A8" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -150,17 +157,21 @@ export const AnalyticsPage = () => {
       <div className="saas-card p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-bold text-[#2E3A8C]">Daily Station Energy Delivered (kWh)</h3>
-            <p className="text-xs text-slate-500">Total electrical throughput dispatched through charging bays</p>
+            <h3 className="text-sm font-bold text-[#2E3A8C]">Energy delivered to vehicles each day</h3>
+            <p className="text-xs text-slate-500">The line shows total energy delivered, in kWh. Higher points mean more energy was used for charging that day.</p>
           </div>
         </div>
 
-        <div className="h-64 w-full">
+        <div
+          className="h-64 w-full"
+          role="img"
+          aria-label="Line chart showing daily energy delivered to vehicles in kilowatt-hours."
+        >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={dailyTrends} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} unit=" kWh" />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: '#FFFFFF', 

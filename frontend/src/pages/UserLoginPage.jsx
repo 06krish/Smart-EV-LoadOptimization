@@ -19,8 +19,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 
-export const UserLoginPage = () => {
-  const [isRegister, setIsRegister] = useState(false);
+export const UserLoginPage = ({ initialMode = 'login' }) => {
+  const [isRegister, setIsRegister] = useState(initialMode === 'register');
   const [email, setEmail] = useState(() => localStorage.getItem('smartev_remembered_user') || 'user@smartev.io');
   const [password, setPassword] = useState('user123');
   const [showPassword, setShowPassword] = useState(false);
@@ -429,4 +429,3 @@ export const UserLoginPage = () => {
 };
 
 export default UserLoginPage;
-

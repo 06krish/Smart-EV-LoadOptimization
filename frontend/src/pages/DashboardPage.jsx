@@ -349,11 +349,13 @@ export const DashboardPage = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="text-sm font-bold text-[#2E3A8C] dark:text-white">
-                  {chartMode === 'curve' ? 'Real-Time Load Curve (Telemetry vs ML Forecast)' : 'Upcoming 12h Tariff Surcharge Trajectory'}
+                  {chartMode === 'curve' ? 'Station load over time' : 'Predicted station load: next 12 hours'}
                 </h3>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Continuous telemetry comparison with scikit-learn autoregressive regression (MAE: 4.66 kW).
+                {chartMode === 'curve'
+                  ? 'Read left to right for time and bottom to top for power (kW). Teal is measured load; purple is the model estimate. The red line is the 100 kW station limit.'
+                  : 'Each bar shows the predicted station load at that time. The amber line marks 85 kW, where operators should review upcoming demand.'}
               </p>
             </div>
 
@@ -382,7 +384,13 @@ export const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="h-72 w-full mt-4">
+          <div
+            className="h-72 w-full mt-4"
+            role="img"
+            aria-label={chartMode === 'curve'
+              ? 'Chart of measured and predicted station power in kilowatts over time, compared with the 100 kilowatt grid limit.'
+              : 'Bar chart of predicted station power in kilowatts for the next 12 hours, with an 85 kilowatt warning level.'}
+          >
             <ResponsiveContainer width="100%" height="100%">
               {chartMode === 'curve' ? (
                 <AreaChart data={chartPoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -398,7 +406,7 @@ export const DashboardPage = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1E293B' : '#F1F5F9'} />
                   <XAxis dataKey="hour" tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} tickFormatter={(h) => `${h}:00`} />
-                  <YAxis tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} domain={[0, 110]} />
+                  <YAxis tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} domain={[0, 110]} unit=" kW" />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: isDark ? '#1E293B' : '#FFFFFF', 
@@ -407,7 +415,7 @@ export const DashboardPage = () => {
                       color: isDark ? '#F1F5F9' : '#1E293B',
                       boxShadow: '0 4px 20px rgba(0,0,0,0.3)' 
                     }}
-                    formatter={(val, name) => [`${val} kW`, name === 'actual_load_kw' ? 'Telemetry Observed' : 'ML Predicted']}
+                    formatter={(val, name) => [`${val} kW`, name]}
                     labelFormatter={(l) => `Hour ${l}:00`}
                   />
                   <ReferenceLine 
@@ -419,7 +427,7 @@ export const DashboardPage = () => {
                   <Area 
                     type="monotone" 
                     dataKey="actual_load_kw" 
-                    name="actual_load_kw" 
+                    name="Measured station load"
                     stroke="#00C2A8" 
                     strokeWidth={2.5} 
                     fillOpacity={1} 
@@ -428,7 +436,7 @@ export const DashboardPage = () => {
                   <Area 
                     type="monotone" 
                     dataKey="predicted_load_kw" 
-                    name="predicted_load_kw" 
+                    name="Predicted station load"
                     stroke="#465ABB" 
                     strokeWidth={2} 
                     strokeDasharray="4 4" 
@@ -441,7 +449,7 @@ export const DashboardPage = () => {
                 <BarChart data={futurePoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#1E293B' : '#F1F5F9'} />
                   <XAxis dataKey="time_label" tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} />
-                  <YAxis tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} />
+                  <YAxis tick={{ fontSize: 11, fill: isDark ? '#94A3B8' : '#64748B' }} unit=" kW" />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: isDark ? '#1E293B' : '#FFFFFF', 
@@ -453,7 +461,7 @@ export const DashboardPage = () => {
                     formatter={(val) => [`${val} kW`, 'Anticipated Load']}
                   />
                   <ReferenceLine y={85} stroke="#F59E0B" strokeDasharray="3 3" label={{ value: 'Peak Warning', fill: '#D97706', fontSize: 10 }} />
-                  <Bar dataKey="predicted_load_kw" fill="#00C2A8" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="predicted_load_kw" name="Predicted station load" fill="#00C2A8" radius={[6, 6, 0, 0]} />
                 </BarChart>
               )}
             </ResponsiveContainer>

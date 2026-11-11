@@ -105,7 +105,7 @@ export const LoadPredictionPage = () => {
             <span className="text-2xl font-extrabold text-[#2E3A8C] font-mono">{metrics.mae || 4.66}</span>
             <span className="text-xs text-slate-500 font-mono">kW</span>
           </div>
-          <span className="text-[10px] text-emerald-600 font-semibold mt-1 block">Low prediction variance</span>
+          <span className="text-[10px] text-emerald-600 font-semibold mt-1 block">Typical miss on past hours</span>
         </div>
 
         <div className="saas-card p-4">
@@ -114,7 +114,7 @@ export const LoadPredictionPage = () => {
             <span className="text-2xl font-extrabold text-[#2E3A8C] font-mono">{metrics.rmse || 6.13}</span>
             <span className="text-xs text-slate-500 font-mono">kW</span>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono mt-1 block">Penalizes peak errors</span>
+          <span className="text-[10px] text-slate-400 font-mono mt-1 block">Highlights larger misses</span>
         </div>
 
         <div className="saas-card p-4">
@@ -122,7 +122,7 @@ export const LoadPredictionPage = () => {
           <div className="flex items-baseline space-x-1 mt-1">
             <span className="text-2xl font-extrabold text-[#008472] font-mono">{metrics.r2_score || 0.8838}</span>
           </div>
-          <span className="text-[10px] text-[#008472] font-semibold mt-1 block">88.4% variance explained</span>
+          <span className="text-[10px] text-[#008472] font-semibold mt-1 block">Closer to 1 means better fit</span>
         </div>
 
         <div className="saas-card p-4">
@@ -130,7 +130,7 @@ export const LoadPredictionPage = () => {
           <div className="flex items-baseline space-x-1 mt-1">
             <span className="text-2xl font-extrabold text-[#2E3A8C] font-mono">{metrics.mape_percent || 14.0}%</span>
           </div>
-          <span className="text-[10px] text-emerald-700 font-semibold mt-1 block">Industry benchmark &lt; 15%</span>
+          <span className="text-[10px] text-emerald-700 font-semibold mt-1 block">Average error as a percentage</span>
         </div>
       </div>
 
@@ -139,10 +139,10 @@ export const LoadPredictionPage = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
           <div>
             <h3 className="text-sm font-bold text-[#2E3A8C]">
-              Future Load Trajectory ({horizon}-Hour Forecast with 95% Confidence Bounds)
+              Forecast station load for the next {horizon} hours
             </h3>
             <p className="text-xs text-slate-500">
-              Anticipated draw profile with peak-tariff markers for autonomous load-shifting.
+              Time runs left to right; power is shown in kW. The teal line is predicted demand, the shaded band shows the model’s uncertainty, and the red line is the 100 kW grid limit.
             </p>
           </div>
           <div className="flex items-center space-x-3 text-xs">
@@ -153,7 +153,11 @@ export const LoadPredictionPage = () => {
           </div>
         </div>
 
-        <div className="h-80 w-full mt-4">
+        <div
+          className="h-80 w-full mt-4"
+          role="img"
+          aria-label={`Forecast chart showing predicted station power in kilowatts over the next ${horizon} hours, with an uncertainty band and a 100 kilowatt grid limit.`}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={forecast} margin={{ top: 15, right: 15, left: -15, bottom: 0 }}>
               <defs>
@@ -164,7 +168,7 @@ export const LoadPredictionPage = () => {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="time_label" tick={{ fontSize: 11, fill: '#64748B' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} domain={[0, 110]} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} domain={[0, 110]} unit=" kW" />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: '#FFFFFF', 
@@ -174,13 +178,13 @@ export const LoadPredictionPage = () => {
                 }}
                 formatter={(val, name) => [
                   `${val} kW`, 
-                  name === 'predicted_load_kw' ? 'Predicted Load' : name === 'upper_ci_kw' ? 'Upper 95% CI' : 'Lower 95% CI'
+                  name === 'Predicted station load' ? 'Predicted station load' : name
                 ]}
               />
               <ReferenceLine y={100} label={{ value: '100 kW Ceiling', position: 'insideTopRight', fill: '#EF4444', fontSize: 11, fontWeight: 'bold' }} stroke="#EF4444" strokeDasharray="4 4" />
-              <Area type="monotone" dataKey="upper_ci_kw" stroke="#52DFCE" strokeDasharray="3 3" fillOpacity={1} fill="url(#ciTeal)" name="upper_ci_kw" />
-              <Area type="monotone" dataKey="lower_ci_kw" stroke="#52DFCE" strokeDasharray="3 3" fillOpacity={0} name="lower_ci_kw" />
-              <Area type="monotone" dataKey="predicted_load_kw" stroke="#00C2A8" strokeWidth={2.5} fillOpacity={0} name="predicted_load_kw" />
+              <Area type="monotone" dataKey="upper_ci_kw" stroke="#52DFCE" strokeDasharray="3 3" fillOpacity={1} fill="url(#ciTeal)" name="Upper estimate" />
+              <Area type="monotone" dataKey="lower_ci_kw" stroke="#52DFCE" strokeDasharray="3 3" fillOpacity={0} name="Lower estimate" />
+              <Area type="monotone" dataKey="predicted_load_kw" stroke="#00C2A8" strokeWidth={2.5} fillOpacity={0} name="Predicted station load" />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
             </AreaChart>
           </ResponsiveContainer>
@@ -192,20 +196,24 @@ export const LoadPredictionPage = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-sm font-bold text-[#2E3A8C]">
-              Model Validation: Ground Truth Observations vs Model Predictions (Test Set)
+              How close were past forecasts?
             </h3>
             <p className="text-xs text-slate-500">
-              Evaluated on strict chronological hold-out test split (zero data leakage)
+              Teal is the measured load and amber is what the model predicted. Lines closer together mean the forecast was more accurate. Values are in kW.
             </p>
           </div>
         </div>
 
-        <div className="h-72 w-full">
+        <div
+          className="h-72 w-full"
+          role="img"
+          aria-label="Comparison of measured and predicted station power over past hours. Closer lines indicate more accurate forecasts."
+        >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={actualVsPred} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="hour" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(h) => `${h}:00`} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} domain={[0, 100]} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} domain={[0, 100]} unit=" kW" />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: '#FFFFFF', 
@@ -213,11 +221,11 @@ export const LoadPredictionPage = () => {
                   border: '1px solid #E2E8F0', 
                   boxShadow: '0 4px 20px rgba(46,58,140,0.08)' 
                 }}
-                formatter={(val, name) => [`${val} kW`, name === 'actual_load_kw' ? 'Actual Observed' : 'Model Output']} 
+                formatter={(val, name) => [`${val} kW`, name]}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-              <Line type="monotone" dataKey="actual_load_kw" name="actual_load_kw" stroke="#00C2A8" strokeWidth={2.5} dot={{ r: 2 }} />
-              <Line type="monotone" dataKey="predicted_load_kw" name="predicted_load_kw" stroke="#F59E0B" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 2 }} />
+              <Line type="monotone" dataKey="actual_load_kw" name="Measured station load" stroke="#00C2A8" strokeWidth={2.5} dot={{ r: 2 }} />
+              <Line type="monotone" dataKey="predicted_load_kw" name="Predicted station load" stroke="#F59E0B" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 2 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

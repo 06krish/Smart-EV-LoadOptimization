@@ -26,7 +26,6 @@ import {
   Tooltip, 
   CartesianGrid, 
   ReferenceLine, 
-  Legend 
 } from 'recharts';
 import { SmartEVApi } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
@@ -89,17 +88,13 @@ export const OptimizationPage = () => {
 
   const allocations = result?.allocations || [];
 
-  const comparisonData = result ? [
-    {
-      metric: 'Peak Demand (kW)',
-      'Uncoordinated Baseline': result.peak_load_before_kw,
-      'Smart-EV Optimized': result.peak_load_after_kw,
-    },
-    {
-      metric: 'Electricity Cost ($)',
-      'Uncoordinated Baseline': result.cost_before_optimization,
-      'Smart-EV Optimized': result.cost_after_optimization,
-    }
+  const peakComparisonData = result ? [
+    { scenario: 'Before', load_kw: result.peak_load_before_kw },
+    { scenario: 'After', load_kw: result.peak_load_after_kw },
+  ] : [];
+  const costComparisonData = result ? [
+    { scenario: 'Before', cost_usd: result.cost_before_optimization },
+    { scenario: 'After', cost_usd: result.cost_after_optimization },
   ] : [];
 
   return (
@@ -270,35 +265,65 @@ export const OptimizationPage = () => {
 
       {/* Comparison Chart */}
       {result && (
-        <div className="saas-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-bold text-[#2E3A8C]">Before vs After Optimization Quantitative Benchmark</h3>
-              <p className="text-xs text-slate-500">
-                Direct comparison against uncoordinated simultaneous charging baseline (110 kW demand on 100 kW grid)
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-sm font-bold text-[#2E3A8C]">What changed after optimization?</h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Compare each measure separately. Lower bars mean lower peak load or lower estimated cost.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="saas-card p-5">
+              <h4 className="text-sm font-bold text-[#2E3A8C]">Peak station load</h4>
+              <p className="text-xs text-slate-500 mt-1">Total station power, including the facility’s base load. Must stay below the grid limit.</p>
+              <div
+                className="h-48 w-full mt-3"
+                role="img"
+                aria-label={`Peak station load before optimization: ${result.peak_load_before_kw} kilowatts. After optimization: ${result.peak_load_after_kw} kilowatts. Grid limit: ${result.grid_capacity_kw} kilowatts.`}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={peakComparisonData} layout="vertical" margin={{ top: 4, right: 20, left: 12, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} unit=" kW" />
+                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={52} />
+                    <Tooltip formatter={(value) => [`${value} kW`, 'Peak station load']} />
+                    <ReferenceLine
+                      x={result.grid_capacity_kw}
+                      stroke="#EF4444"
+                      strokeDasharray="4 4"
+                      label={{ value: 'Grid limit', position: 'insideTopRight', fontSize: 10, fill: '#B91C1C' }}
+                    />
+                    <Bar dataKey="load_kw" name="Peak station load" fill="#00C2A8" radius={[0, 6, 6, 0]} barSize={28} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-xs font-semibold text-slate-600 mt-1">
+                Grid limit: {result.grid_capacity_kw} kW. Before: {result.peak_load_before_kw} kW; after: {result.peak_load_after_kw} kW.
               </p>
             </div>
-          </div>
 
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                <XAxis dataKey="metric" tick={{ fontSize: 12, fill: '#2E3A8C', fontWeight: 600 }} />
-                <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#FFFFFF', 
-                    borderRadius: '12px', 
-                    border: '1px solid #E2E8F0', 
-                    boxShadow: '0 4px 20px rgba(46,58,140,0.08)' 
-                  }} 
-                />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Bar dataKey="Uncoordinated Baseline" fill="#EF4444" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="Smart-EV Optimized" fill="#00C2A8" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="saas-card p-5">
+              <h4 className="text-sm font-bold text-[#2E3A8C]">Estimated electricity cost</h4>
+              <p className="text-xs text-slate-500 mt-1">Estimated cost for the same charging demand before and after the optimized schedule.</p>
+              <div
+                className="h-48 w-full mt-3"
+                role="img"
+                aria-label={`Estimated electricity cost before optimization: ${result.cost_before_optimization} dollars. After optimization: ${result.cost_after_optimization} dollars.`}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={costComparisonData} layout="vertical" margin={{ top: 4, right: 20, left: 12, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(value) => `$${value}`} />
+                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={52} />
+                    <Tooltip formatter={(value) => [`$${value}`, 'Estimated cost']} />
+                    <Bar dataKey="cost_usd" name="Estimated cost" fill="#2E3A8C" radius={[0, 6, 6, 0]} barSize={28} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-xs font-semibold text-slate-600 mt-1">
+                Before: ${result.cost_before_optimization}; after: ${result.cost_after_optimization}; estimated savings: ${result.estimated_savings}.
+              </p>
+            </div>
           </div>
         </div>
       )}
