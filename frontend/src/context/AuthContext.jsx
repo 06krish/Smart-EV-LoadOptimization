@@ -36,26 +36,29 @@ export const AuthProvider = ({ children }) => {
   }, [refreshToken]);
 
   const login = async (emailOrUsername, password, portal = 'USER', rememberMe = true) => {
+    const normalizedPortal = typeof portal === 'string' ? portal.toUpperCase() : portal === true ? 'ADMIN' : 'USER';
+    const shouldRemember = typeof rememberMe === 'boolean' ? rememberMe : portal === true;
+
     try {
       const res = await SmartEVApi.login({ 
         email: emailOrUsername, 
         password,
-        portal 
+        portal: normalizedPortal
       });
       const { user: userData, access, refresh, role, role_label } = res.data;
       const combinedUser = { 
         ...userData, 
-        role: role || (portal === 'ADMIN' ? 'ADMIN' : 'USER'),
-        role_label: role_label || (role === 'ADMIN' ? 'Grid Administrator' : 'EV Fleet Driver'),
-        isAdmin: role === 'ADMIN' || userData.is_admin
+        role: role || (normalizedPortal === 'ADMIN' ? 'ADMIN' : 'USER'),
+        role_label: role_label || (role === 'ADMIN' || normalizedPortal === 'ADMIN' ? 'Grid Administrator' : 'EV Fleet Driver'),
+        isAdmin: role === 'ADMIN' || userData.is_admin || normalizedPortal === 'ADMIN'
       };
       
       setUser(combinedUser);
       setAccessToken(access);
       setRefreshToken(refresh);
 
-      if (rememberMe) {
-        localStorage.setItem(`smartev_remembered_${portal.toLowerCase()}`, emailOrUsername);
+      if (shouldRemember) {
+        localStorage.setItem(`smartev_remembered_${normalizedPortal.toLowerCase()}`, emailOrUsername);
       }
 
       return { success: true, user: combinedUser };

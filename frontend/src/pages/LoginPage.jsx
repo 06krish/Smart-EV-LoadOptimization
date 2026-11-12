@@ -95,7 +95,7 @@ export const LoginPage = () => {
           setError(res.error);
         }
       } else {
-        const res = await login(email.trim(), password, rememberMe);
+        const res = await login(email.trim(), password, 'ADMIN', rememberMe);
         if (res.success) {
           setSuccessMsg('Authentication successful! Initializing dispatch console...');
           setTimeout(() => navigate(from, { replace: true }), 700);
