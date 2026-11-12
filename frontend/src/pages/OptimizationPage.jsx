@@ -266,63 +266,94 @@ export const OptimizationPage = () => {
       {/* Comparison Chart */}
       {result && (
         <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-bold text-[#2E3A8C]">What changed after optimization?</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Compare each measure separately. Lower bars mean lower peak load or lower estimated cost.
+          <div className="saas-card p-4 bg-teal-50/50 dark:bg-slate-900/60 border border-teal-200/60 dark:border-teal-900/40">
+            <h3 className="text-sm font-bold text-[#2E3A8C] dark:text-teal-300 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-[#00C2A8]" />
+              <span>How To Read This Comparison (Simple Guide)</span>
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+              <strong>Red bars</strong> show what happens if all EVs charge at once without smart control (high peak load, high electricity bill). <br />
+              <strong>Teal bars</strong> show our smart optimization result: lower peaks, cheaper electricity, and 100% safe charging under the transformer limit.
             </p>
           </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="saas-card p-5">
-              <h4 className="text-sm font-bold text-[#2E3A8C]">Peak station load</h4>
-              <p className="text-xs text-slate-500 mt-1">Total station power, including the facility’s base load. Must stay below the grid limit.</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-[#2E3A8C] dark:text-white">1. Peak Station Power (kW)</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">Lower is safer. Must stay below the 100 kW grid ceiling.</p>
+                </div>
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  {result.peak_reduction_percent}% Peak Shaved
+                </span>
+              </div>
+
               <div
                 className="h-48 w-full mt-3"
                 role="img"
                 aria-label={`Peak station load before optimization: ${result.peak_load_before_kw} kilowatts. After optimization: ${result.peak_load_after_kw} kilowatts. Grid limit: ${result.grid_capacity_kw} kilowatts.`}
               >
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={peakComparisonData} layout="vertical" margin={{ top: 4, right: 20, left: 12, bottom: 4 }}>
+                  <BarChart data={peakComparisonData} layout="vertical" margin={{ top: 4, right: 30, left: 12, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} unit=" kW" />
-                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={52} />
-                    <Tooltip formatter={(value) => [`${value} kW`, 'Peak station load']} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} unit=" kW" domain={[0, Math.max(120, result.peak_load_before_kw + 10)]} />
+                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={70} />
+                    <Tooltip formatter={(value) => [`${value} kW`, 'Peak Load']} />
                     <ReferenceLine
                       x={result.grid_capacity_kw}
                       stroke="#EF4444"
                       strokeDasharray="4 4"
-                      label={{ value: 'Grid limit', position: 'insideTopRight', fontSize: 10, fill: '#B91C1C' }}
+                      label={{ value: '100 kW Grid Limit', position: 'insideTopRight', fontSize: 10, fill: '#B91C1C' }}
                     />
-                    <Bar dataKey="load_kw" name="Peak station load" fill="#00C2A8" radius={[0, 6, 6, 0]} barSize={28} />
+                    <Bar dataKey="load_kw" name="Peak Load" radius={[0, 6, 6, 0]} barSize={28}>
+                      {peakComparisonData.map((entry, index) => (
+                        <cell key={`cell-${index}`} fill={index === 0 ? '#EF4444' : '#00C2A8'} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-xs font-semibold text-slate-600 mt-1">
-                Grid limit: {result.grid_capacity_kw} kW. Before: {result.peak_load_before_kw} kW; after: {result.peak_load_after_kw} kW.
-              </p>
+              <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-300 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span>Before: <strong className="text-coral-600">{result.peak_load_before_kw} kW</strong> (Over limit)</span>
+                <span>After: <strong className="text-teal-600">{result.peak_load_after_kw} kW</strong> (Safe)</span>
+              </div>
             </div>
 
             <div className="saas-card p-5">
-              <h4 className="text-sm font-bold text-[#2E3A8C]">Estimated electricity cost</h4>
-              <p className="text-xs text-slate-500 mt-1">Estimated cost for the same charging demand before and after the optimized schedule.</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-[#2E3A8C] dark:text-white">2. Electricity Bill ($ USD)</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">Estimated cost to deliver the required charging energy.</p>
+                </div>
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  {result.savings_percent}% Cost Saved
+                </span>
+              </div>
+
               <div
                 className="h-48 w-full mt-3"
                 role="img"
                 aria-label={`Estimated electricity cost before optimization: ${result.cost_before_optimization} dollars. After optimization: ${result.cost_after_optimization} dollars.`}
               >
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={costComparisonData} layout="vertical" margin={{ top: 4, right: 20, left: 12, bottom: 4 }}>
+                  <BarChart data={costComparisonData} layout="vertical" margin={{ top: 4, right: 30, left: 12, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                     <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(value) => `$${value}`} />
-                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={52} />
-                    <Tooltip formatter={(value) => [`$${value}`, 'Estimated cost']} />
-                    <Bar dataKey="cost_usd" name="Estimated cost" fill="#2E3A8C" radius={[0, 6, 6, 0]} barSize={28} />
+                    <YAxis type="category" dataKey="scenario" tick={{ fontSize: 12, fill: '#475569' }} width={70} />
+                    <Tooltip formatter={(value) => [`$${value}`, 'Cost']} />
+                    <Bar dataKey="cost_usd" name="Estimated Cost" radius={[0, 6, 6, 0]} barSize={28}>
+                      {costComparisonData.map((entry, index) => (
+                        <cell key={`cost-cell-${index}`} fill={index === 0 ? '#EF4444' : '#00C2A8'} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-xs font-semibold text-slate-600 mt-1">
-                Before: ${result.cost_before_optimization}; after: ${result.cost_after_optimization}; estimated savings: ${result.estimated_savings}.
-              </p>
+              <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-slate-300 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span>Before: <strong className="text-coral-600">${result.cost_before_optimization}</strong></span>
+                <span>After: <strong className="text-teal-600">${result.cost_after_optimization}</strong> (Saved ${result.estimated_savings})</span>
+              </div>
             </div>
           </div>
         </div>
