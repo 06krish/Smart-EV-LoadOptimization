@@ -11,8 +11,10 @@ const api = axios.create({
 // Request interceptor to attach JWT Access Token
 api.interceptors.request.use(
   (config) => {
+    // Do not attach expired/invalid tokens to public authentication endpoints
+    const isAuthEndpoint = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
     const token = localStorage.getItem('smartev_access_token');
-    if (token) {
+    if (token && !isAuthEndpoint) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
@@ -23,6 +25,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // If token is invalid or expired (401), clean up stale credentials automatically
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
+      localStorage.removeItem('smartev_user');
+      localStorage.removeItem('smartev_access_token');
+      localStorage.removeItem('smartev_refresh_token');
+    }
+
     const message = error.response?.data?.error || 
                     error.response?.data?.detail || 
                     error.message || 
